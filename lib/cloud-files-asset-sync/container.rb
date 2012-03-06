@@ -9,7 +9,7 @@ module CloudfileAsset
     end
 
     def container
-      @container ||=  CloudFiles::Connection.new(config[:username], config[:api_key]).container(config[:assets_container])
+      @container ||=  CloudFiles::Connection.new(:username => config[:username], :api_key => config[:api_key], :snet => config[:service_net]).container(config[:assets_container])
     end
     
     # TODO: Is this the same as Action Pack -> ActionView::Helpers::AssetTagHelper.asset_file_path and collect_asset_files
@@ -23,7 +23,7 @@ module CloudfileAsset
     
     def upload_file(filename)
       object = @container.create_object(filename, false)
-      object.load_from_filename(CloudfileAsset::Local.make_absolute(filename))
+      object.load_from_filename(CloudfileAsset::Local.make_absolute(filename), {'Expires' => CGI.rfc1123_date(Time.now + 1.year), 'Cache-Control' => 'public, max-age=31557600', 'Content-Type' => Mime::Type.lookup_by_extension(File.extname(filename)[1..-1]).to_s})
     end
     
     def delete_file(filename)
