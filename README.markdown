@@ -1,5 +1,7 @@
 CloudfileAssetSync
 ==================
+Forked from: https://github.com/phillc/cloud-files-asset-sync
+
 This gem is intended to allow for easy movement of assets (e.g. rails public folder) to Rackspace's cloud files.
 
 Dependencies
