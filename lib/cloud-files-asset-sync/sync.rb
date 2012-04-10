@@ -11,6 +11,11 @@ module CloudfileAsset
         deleted_files = options[:delete] ? container.deleted_files : []
         begin_time = Time.new
 
+        if options[:single_file]
+          container.upload_file options[:single_file]
+          puts "uploading file - #{options[:single_file]}" if options[:loud]
+        end
+
         (new_files + modified_files).each do |file|
           if options[:loud]
             start = Time.new
