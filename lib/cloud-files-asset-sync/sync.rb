@@ -6,6 +6,7 @@ module CloudfileAsset
         CloudfileAsset::yml_config = options[:config]
         
         container = CloudfileAsset::Container.new
+
         new_files = container.new_files
         modified_files = options[:modified] ? container.modified_files : []
         deleted_files = options[:delete] ? container.deleted_files : []

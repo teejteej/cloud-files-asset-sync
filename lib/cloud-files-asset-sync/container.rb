@@ -18,7 +18,15 @@ module CloudfileAsset
     end
     
     def remote_files
-      @remote_files ||= @container.objects
+      unless @remote_files
+        @remote_files = []
+
+        while @container.count != @remote_files.size
+          @remote_files += @container.objects :marker => @remote_files.last
+        end
+      end
+      
+      @remote_files
     end
     
     def upload_file(filename)
