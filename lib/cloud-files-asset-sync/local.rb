@@ -11,8 +11,8 @@ module CloudfileAsset
               false
           end
         end
-        
-        public_asset_files = Dir[[CloudfileAsset::local_public_path, '/assets/*.*'].join]
+
+        public_asset_files = Dir[[CloudfileAsset::local_public_path, 'assets/*.*'].join]
         
         return (public_files + public_asset_files).uniq
       end
