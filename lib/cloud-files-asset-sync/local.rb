@@ -1,20 +1,10 @@
+require 'pathname'
+
 module CloudfileAsset
   module Local
     class << self
       def public_files
-        public_files = Dir[[CloudfileAsset::local_public_path, '**/*.*'].join].reject do |file|
-          extension = file.split('.').last
-          case extension
-            when 'cgi', 'fcgi', 'rb', 'sass'
-              true
-            else
-              false
-          end
-        end
-
-        public_asset_files = Dir[[CloudfileAsset::local_public_path, 'assets/*.*'].join]
-        
-        return (public_files + public_asset_files).uniq
+        recursive_files(Pathname.new(CloudfileAsset::local_public_path)).collect(&:to_s)
       end
       
       # TODO: Is this the same as Action Pack -> ActionView::Helpers::AssetTagHelper private methods?
@@ -24,6 +14,19 @@ module CloudfileAsset
       def make_absolute(filename)
         [CloudfileAsset::local_public_path, filename].join
       end
+      
+      private
+      
+      def recursive_files(path)
+        path.children.collect do |child|
+          if child.file?
+            child
+          elsif child.directory?
+            recursive_files child
+          end
+        end.select { |x| x }.flatten(1)
+      end
+      
     end
   end
 end
