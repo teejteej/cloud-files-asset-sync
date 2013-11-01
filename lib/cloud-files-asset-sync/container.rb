@@ -30,12 +30,16 @@ module CloudfileAsset
     end
     
     def upload_file(filename)
-      object = @container.create_object(filename, false)
-      object.load_from_filename(CloudfileAsset::Local.make_absolute(filename), {'Expires' => CGI.rfc1123_date(Time.now + 1.year), 'Cache-Control' => 'public, max-age=31557600', 'Content-Type' => Mime::Type.lookup_by_extension(File.extname(filename)[1..-1]).to_s})
+      retry_operation do
+        object = @container.create_object(filename, false)
+        object.load_from_filename(CloudfileAsset::Local.make_absolute(filename), {'Expires' => CGI.rfc1123_date(Time.now + 1.year), 'Cache-Control' => 'public, max-age=31557600', 'Content-Type' => Mime::Type.lookup_by_extension(File.extname(filename)[1..-1]).to_s})
+      end
     end
     
     def delete_file(filename)
-      @container.delete_object(filename)
+      retry_operation do
+        @container.delete_object(filename)
+      end
     end
     
     def new_files
@@ -57,5 +61,23 @@ module CloudfileAsset
     def deleted_files
       remote_files - local_files
     end
+    
+    def retry_operation
+      retries_left = 10
+      sleep_time_seconds = 4
+
+      while retries_left > 0 do
+        begin
+          yield
+          break
+        rescue Exception => e
+          puts "Retrying operation [#{e.message}]: #{retries_left} retries left..."
+        end
+
+        retries_left -= 1
+        Kernel.sleep sleep_time_seconds
+      end
+    end
+    
   end
 end
