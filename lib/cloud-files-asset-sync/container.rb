@@ -5,7 +5,7 @@ module CloudfileAsset
       container
     end
     def config
-      @config ||= YAML.load_file(CloudfileAsset::yml_config)[Rails.env].symbolize_keys
+      @config ||= YAML.load_file(CloudfileAsset::yml_config)[ENV['CLOUDFILES_CONFIG_ENV'] || Rails.env].symbolize_keys
     end
 
     def container
