@@ -29,10 +29,13 @@ module CloudfileAsset
       @remote_files
     end
     
-    def upload_file(filename)
+    def upload_file(filename, extra_headers = {})
       retry_operation do
+        file_headers = {'Expires' => CGI.rfc1123_date(Time.now + 10.year), 'Cache-Control' => 'public, max-age=315576000', 'Content-Type' => Mime::Type.lookup_by_extension(File.extname(filename)[1..-1]).to_s}
+        file_headers = file_headers.merge extra_headers
+        
         object = @container.create_object(filename, false)
-        object.load_from_filename(CloudfileAsset::Local.make_absolute(filename), {'Expires' => CGI.rfc1123_date(Time.now + 1.year), 'Cache-Control' => 'public, max-age=31557600', 'Content-Type' => Mime::Type.lookup_by_extension(File.extname(filename)[1..-1]).to_s})
+        object.load_from_filename(CloudfileAsset::Local.make_absolute(filename), file_headers)
       end
     end
     

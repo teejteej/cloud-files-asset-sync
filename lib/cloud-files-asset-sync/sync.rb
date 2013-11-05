@@ -23,7 +23,7 @@ module CloudfileAsset
             puts "uploading file - #{file}"
           end
 
-          container.upload_file(file)
+          container.upload_file(file, (options[:extra_headers] || {}))
 
           if options[:loud]
             now = Time.new
