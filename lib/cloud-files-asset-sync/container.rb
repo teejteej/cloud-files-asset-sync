@@ -69,16 +69,26 @@ module CloudfileAsset
       retries_left = 10
       sleep_time_seconds = 4
 
+      exception = nil
+
       while retries_left > 0 do
         begin
           yield
+          
+          exception = nil
+          
           break
         rescue Exception => e
+          exception = e
           puts "Retrying operation [#{e.message}]: #{retries_left} retries left..."
         end
 
         retries_left -= 1
         Kernel.sleep sleep_time_seconds
+      end
+      
+      if exception
+        raise exception
       end
     end
     
